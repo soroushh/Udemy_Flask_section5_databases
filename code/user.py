@@ -31,3 +31,16 @@ class User:
             user = None
         connection.close()
         return user
+    @classmethod
+    def sign_up(cls,_id, username , password):
+        if cls.find_by_username(username):
+            return("The username already exists.")
+        else:
+            connection = sqlite3.connect("data.db")
+            create_query = "INSERT INTO users VALUES (?,?,?)"
+            cursor = connection.cursor()
+            cursor.execute(create_query , (_id,username , password))
+            connection.commit()
+            connection.close()
+            return cls(_id, username , password)
+User.sign_up(2,"ali","1234")
