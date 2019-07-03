@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse
 from flask_jwt import JWT, jwt_required
 from security import authenticate, identity
+from user import UserRegister
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = "soroush"
@@ -47,4 +48,5 @@ class Items(Resource):
         return {"items":items}
 api.add_resource(Item , '/item/<string:name>')
 api.add_resource(Items , '/items')
+api.add_resource(UserRegister , '/register')
 app.run( port = 5000, debug = True )

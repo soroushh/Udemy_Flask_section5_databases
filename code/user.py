@@ -1,4 +1,7 @@
 import sqlite3
+from flask import request, jsonify
+from flask_restful import Api, Resource, reqparse
+from flask import Flask, request, jsonify
 class User:
     def __init__(self, _id, username , password):
         self.id = _id
@@ -31,16 +34,28 @@ class User:
             user = None
         connection.close()
         return user
-    @classmethod
-    def sign_up(cls,_id, username , password):
-        if cls.find_by_username(username):
-            return("The username already exists.")
-        else:
-            connection = sqlite3.connect("data.db")
-            create_query = "INSERT INTO users VALUES (?,?,?)"
-            cursor = connection.cursor()
-            cursor.execute(create_query , (_id,username , password))
-            connection.commit()
-            connection.close()
-            return cls(_id, username , password)
-User.sign_up(2,"ali","1234")
+
+class UserRegister(Resource):
+    def post(self):
+        data = request.get_json()
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        add_user = "INSERT INTO users VALUES (NULL,?,?)"
+        cursor.execute(add_user, (data["username"], data["password"]))
+        connection.commit()
+        connection.close()
+        return jsonify({"message":"user created."})
+
+#     @classmethod
+#     def sign_up(cls,_id, username , password):
+#         if cls.find_by_username(username):
+#             print("The username already exists.")
+#         else:
+#             connection = sqlite3.connect("data.db")
+#             create_query = "INSERT INTO users VALUES (?,?,?)"
+#             cursor = connection.cursor()
+#             cursor.execute(create_query , (_id,username , password))
+#             connection.commit()
+#             connection.close()
+#             return cls(_id, username , password)
+# User.sign_up(2,"al","1234")
