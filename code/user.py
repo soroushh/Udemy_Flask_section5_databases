@@ -51,12 +51,13 @@ class UserRegister(Resource):
     )
     def post(self):
         # data = request.get_json()
-
         data = UserRegister.parser.parse_args()
+        if User.find_by_username(data["username"]):
+            return({"message":"User already exists."})
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
-        if cursor.execute("SELECT * FROM users WHERE username=?", (data["username"],)).fetchone():
-            return(jsonify({"message":"user already exists."}))
+        # if cursor.execute("SELECT * FROM users WHERE username=?", (data["username"],)).fetchone():
+        #     return(jsonify({"message":"user already exists."}))
         add_user = "INSERT INTO users VALUES (NULL,?,?)"
         cursor.execute(add_user, (data["username"], data["password"]))
         connection.commit()
