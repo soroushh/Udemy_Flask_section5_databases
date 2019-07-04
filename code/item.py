@@ -1,6 +1,6 @@
 # I am just adding some comment.
 from flask_restful import Resource, reqparse
-from flask_jwt import jwt_required
+from flask_jwt import jwt_required, current_identity
 import sqlite3
 class Item(Resource):
     parser = reqparse.RequestParser()
@@ -11,7 +11,7 @@ class Item(Resource):
     help="The price should be float and it is required to have it in your request."
     )
 
-    # @jwt_required()
+    @jwt_required()
     def get(self,name):
         # item = next(filter(lambda item: item["name"]== name , items), None)
         # return {"item":item} ,200 if item else 404
@@ -22,7 +22,7 @@ class Item(Resource):
         item_row = result.fetchone()
         connection.close()
         if item_row :
-            return({"item":{"name": item_row[0], "price": item_row[1]}}), 200
+            return({"item id:{}".format(current_identity.id):{"name": item_row[0], "price": item_row[1]}}), 200
         else :
             return({"message":"item not found"}), 404
 
@@ -84,7 +84,7 @@ class Items(Resource):
         for item in result:
             items.append({ "name":item[0], "price": item[1]})
         return ({"items":items})
-    def get(self, pet):
+    def post(self, pet):
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         result = cursor.execute("SELECT * FROM items WHERE name=?",(pet,))
