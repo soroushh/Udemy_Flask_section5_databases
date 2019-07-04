@@ -3,6 +3,7 @@ from flask_restful import Api, Resource, reqparse
 from flask_jwt import JWT, jwt_required
 from security import authenticate, identity
 from user import UserRegister
+import sqlite3
 app = Flask(__name__)
 api = Api(app)
 app.secret_key = "soroush"
@@ -18,10 +19,21 @@ class Item(Resource):
     help="The price should be float and it is required to have it in your request."
     )
 
-    @jwt_required()
+    # @jwt_required()
     def get(self,name):
-        item = next(filter(lambda item: item["name"]== name , items), None)
-        return {"item":item} ,200 if item else 404
+        # item = next(filter(lambda item: item["name"]== name , items), None)
+        # return {"item":item} ,200 if item else 404
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        find_item_query = "SELECT * FROM items WHERE name=? "
+        result = cursor.execute(find_item_query , (name,))
+        item_row = result.fetchone()
+        connection.close()
+        if item_row :
+            return({"item":{"name": item_row[0], "price": item_row[1]}}), 200
+        else :
+            return({"message":"item not found"}), 404
+
 
     def post(self, name):
         if next(filter(lambda item: item["name"]== name , items), None):
