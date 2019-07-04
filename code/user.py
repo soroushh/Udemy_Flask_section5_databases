@@ -36,8 +36,23 @@ class User:
         return user
 
 class UserRegister(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument(
+    'username',
+    # type= str,
+    required = True ,
+    help = "The request should include a username."
+    )
+    parser.add_argument(
+    'password',
+    # type= str,
+    required = True ,
+    help = "The request should include a password."
+    )
     def post(self):
-        data = request.get_json()
+        # data = request.get_json()
+
+        data = UserRegister.parser.parse_args()
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         add_user = "INSERT INTO users VALUES (NULL,?,?)"
