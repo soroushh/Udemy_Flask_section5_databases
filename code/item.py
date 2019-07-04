@@ -47,6 +47,10 @@ class Item(Resource):
     def delete(self,name):
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
+        item_row = cursor.execute("SELECT * FROM items WHERE name=?", (name,)).fetchone()
+        if item_row == None:
+            connection.close()
+            return {"message":"The item does not exist."}
         cursor.execute("DELETE FROM items WHERE name=?", (name,))
         connection.commit()
         connection.close()
