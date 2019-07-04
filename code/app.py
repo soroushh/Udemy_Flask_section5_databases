@@ -10,7 +10,7 @@ api = Api(app)
 app.secret_key = "soroush"
 jwt = JWT(app, authenticate, identity)
 api.add_resource(Item , '/item/<string:name>')
-api.add_resource(Items , '/items')
+api.add_resource(Items , '/items', '/rel/<string:pet>')
 api.add_resource(UserRegister , '/register')
 
 if __name__ == "__main__":
