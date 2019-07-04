@@ -58,13 +58,22 @@ class Item(Resource):
 
     def put(self, name):
         request_data = Item.parser.parse_args()
-        item = next(filter(lambda item: item["name"] == name , items), None)
-        if item is None:
-            item = {"name": name , "price": request_data["price"]}
-            items.append(item)
-        else :
-            item.update(request_data)
-        return item
+        # item = next(filter(lambda item: item["name"] == name , items), None)
+        # if item is None:
+        #     item = {"name": name , "price": request_data["price"]}
+        #     items.append(item)
+        # else :
+        #     item.update(request_data)
+        # return item
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        if cursor.execute("SELECT * FROM items WHERE name=?",(name,)).fetchone() is None:
+            connection.close()
+            return {"message": "Item was not found"}, 404
+        cursor.execute("UPDATE items SET price=? WHERE name=?", (request_data["price"], name))
+        connection.commit()
+        connection.close()
+        return {"message":"Item '{}' was updated".format(name)}, 202
 
 class Items(Resource):
     def get(self):
