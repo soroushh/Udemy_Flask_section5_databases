@@ -92,14 +92,13 @@ class Items(Resource):
         for item in result:
             items.append({ "name":item[0], "price": item[1]})
         return ({"items":items})
-    def post(self, pet):
+
+class MultipleItems(Resource):
+    def get(self, price):
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
-        result = cursor.execute("SELECT * FROM items WHERE name=?",(pet,))
-        connection.commit()
-        if result.fetchone():
-            connection.close()
-            return({"message":"item exists"})
-        else:
-            connection.close()
-            return({"message":"item does not exist"})
+        items = cursor.execute("SELECT * FROM items WHERE price < ?", (price,))
+        list_of_items =[]
+        for item in items:
+            list_of_items.append({"name": item[0], "price": item[1]})
+        return {"items":list_of_items}
