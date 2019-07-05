@@ -35,9 +35,13 @@ class Item(Resource):
             return {"message": "Item already exists"}
         data = Item.parser.parse_args()
         item = {"name":name , "price":data["price"]}
-        cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"],item["price"]))
-        connection.commit()
-        connection.close()
+        # cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"],item["price"]))
+        # connection.commit()
+        # connection.close()
+        try:
+            self.insert(item)
+        except:
+            return {"message":"There was an error inside the server."}, 500
         return({"meassgae":"item created"})
 
     def delete(self,name):
@@ -63,6 +67,14 @@ class Item(Resource):
         connection.commit()
         connection.close()
         return {"message":"Item '{}' was updated".format(name)}, 202
+    @classmethod
+    def insert(cls,item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"], item["price"]))
+        connection.commit()
+        connection.close()
+
 
 class Items(Resource):
     def get(self):
