@@ -49,10 +49,8 @@ class Item(Resource):
 
     def put(self, name):
         request_data = Item.parser.parse_args()
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
         item = {"name":name , "price":request_data["price"]}
-        if cursor.execute("SELECT * FROM items WHERE name=?",(item["name"],)).fetchone() is None:
+        if self.find_by_name(name) == False:
             self.insert(item)
             return({"message":"The item did not exist, it was added"})
         else:
