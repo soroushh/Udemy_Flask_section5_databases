@@ -27,11 +27,6 @@ class Item(Resource):
             return({"message":"item not found"}), 404
 
     def post(self, name):
-        # if next(filter(lambda item: item["name"]== name , items), None):
-        #     return {"message":"Item exists already"}, 400
-        # request_data = Item.parser.parse_args()
-        # items.append({"name":name , "price":request_data["price"]})
-        # return {"name":name , "price" :request_data["price"]}, 201
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         item_row = cursor.execute("SELECT * FROM items WHERE name = ?", (name,)).fetchone()
@@ -39,7 +34,8 @@ class Item(Resource):
             connection.close()
             return {"message": "Item already exists"}
         data = Item.parser.parse_args()
-        cursor.execute("INSERT INTO items VALUES (?,?)", (name,data["price"]))
+        item = {"name":name , "price":data["price"]}
+        cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"],item["price"]))
         connection.commit()
         connection.close()
         return({"meassgae":"item created"})
@@ -58,13 +54,6 @@ class Item(Resource):
 
     def put(self, name):
         request_data = Item.parser.parse_args()
-        # item = next(filter(lambda item: item["name"] == name , items), None)
-        # if item is None:
-        #     item = {"name": name , "price": request_data["price"]}
-        #     items.append(item)
-        # else :
-        #     item.update(request_data)
-        # return item
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         if cursor.execute("SELECT * FROM items WHERE name=?",(name,)).fetchone() is None:
