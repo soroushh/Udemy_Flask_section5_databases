@@ -27,11 +27,7 @@ class Item(Resource):
             return({"message":"item not found"}), 404
 
     def post(self, name):
-        connection = sqlite3.connect("data.db")
-        cursor = connection.cursor()
-        item_row = cursor.execute("SELECT * FROM items WHERE name = ?", (name,)).fetchone()
-        if item_row :
-            connection.close()
+        if self.find_by_name(name) :
             return {"message": "Item already exists"}
         data = Item.parser.parse_args()
         item = {"name":name , "price":data["price"]}
@@ -42,12 +38,10 @@ class Item(Resource):
         return({"meassgae":"item created"})
 
     def delete(self,name):
+        if self.find_by_name(name) == False:
+            return {"message":"The item does not exist."}
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
-        item_row = cursor.execute("SELECT * FROM items WHERE name=?", (name,)).fetchone()
-        if item_row == None:
-            connection.close()
-            return {"message":"The item does not exist."}
         cursor.execute("DELETE FROM items WHERE name=?", (name,))
         connection.commit()
         connection.close()
@@ -78,6 +72,16 @@ class Item(Resource):
         cursor.execute("UPDATE items SET price = ? WHERE name= ?", (item["price"], item["name"]))
         connection.commit()
         connection.close()
+
+    @classmethod
+    def find_by_name(cls,name):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        item_row = cursor.execute("SELECT * FROM items WHERE name=?",(name,)).fetchone()
+        if item_row:
+            return True
+        else:
+            return False
 
 
 
