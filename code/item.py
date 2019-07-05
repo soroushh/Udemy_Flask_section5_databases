@@ -59,15 +59,11 @@ class Item(Resource):
         cursor = connection.cursor()
         item = {"name":name , "price":request_data["price"]}
         if cursor.execute("SELECT * FROM items WHERE name=?",(item["name"],)).fetchone() is None:
-            # cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"], item["price"]))
-            # connection.commit()
-            # connection.close()
             self.insert(item)
             return({"message":"The item did not exist, it was added"})
-        cursor.execute("UPDATE items SET price=? WHERE name=?", (item["price"], item["name"]))
-        connection.commit()
-        connection.close()
-        return {"message":"Item '{}' was updated".format(name)}, 202
+        else:
+            self.update(item)
+            return {"message":"Item '{}' was updated".format(name)}, 202
     @classmethod
     def insert(cls,item):
         connection = sqlite3.connect("data.db")
@@ -75,6 +71,14 @@ class Item(Resource):
         cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"], item["price"]))
         connection.commit()
         connection.close()
+    @classmethod
+    def update(cls, item):
+        connection = sqlite3.connect("data.db")
+        cursor = connection.cursor()
+        cursor.execute("UPDATE items SET price = ? WHERE name= ?", (item["price"], item["name"]))
+        connection.commit()
+        connection.close()
+
 
 
 class Items(Resource):
