@@ -35,9 +35,6 @@ class Item(Resource):
             return {"message": "Item already exists"}
         data = Item.parser.parse_args()
         item = {"name":name , "price":data["price"]}
-        # cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"],item["price"]))
-        # connection.commit()
-        # connection.close()
         try:
             self.insert(item)
         except:
@@ -60,10 +57,14 @@ class Item(Resource):
         request_data = Item.parser.parse_args()
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
-        if cursor.execute("SELECT * FROM items WHERE name=?",(name,)).fetchone() is None:
-            connection.close()
-            return {"message": "Item was not found"}, 404
-        cursor.execute("UPDATE items SET price=? WHERE name=?", (request_data["price"], name))
+        item = {"name":name , "price":request_data["price"]}
+        if cursor.execute("SELECT * FROM items WHERE name=?",(item["name"],)).fetchone() is None:
+            # cursor.execute("INSERT INTO items VALUES (?,?)", (item["name"], item["price"]))
+            # connection.commit()
+            # connection.close()
+            self.insert(item)
+            return({"message":"The item did not exist, it was added"})
+        cursor.execute("UPDATE items SET price=? WHERE name=?", (item["price"], item["name"]))
         connection.commit()
         connection.close()
         return {"message":"Item '{}' was updated".format(name)}, 202
