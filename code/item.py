@@ -13,8 +13,6 @@ class Item(Resource):
 
     @jwt_required()
     def get(self,name):
-        # item = next(filter(lambda item: item["name"]== name , items), None)
-        # return {"item":item} ,200 if item else 404
         connection = sqlite3.connect("data.db")
         cursor = connection.cursor()
         find_item_query = "SELECT * FROM items WHERE name=? "
